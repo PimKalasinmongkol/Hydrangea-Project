@@ -1,5 +1,5 @@
 <template>
-  <div class="container-confirmOTP">
+  <div class="container-confirmOTP font-thai">
     <div class="content">
       <h2 class="name-project">Hydrangea Project</h2>
       <div class="button-group">
@@ -37,7 +37,7 @@ const goToLoginPage = () => {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #06A6D0;
+  background: -webkit-linear-gradient(left, #fa4299, #06A6D0);
 }
 
 .content {
@@ -45,6 +45,7 @@ const goToLoginPage = () => {
   padding: 40px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  border-radius: 5px;
   color: #0C7294;
 }
 
@@ -77,7 +78,7 @@ const goToLoginPage = () => {
   background-color: #F8F8FF;
   border: 2px solid #4d4d4d;
   border-radius: 5px;
-  width: 90%;
+  width: 100%;
 }
 
 .btn-otp,

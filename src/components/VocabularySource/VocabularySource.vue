@@ -1,13 +1,16 @@
 <template>
-
   <head>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
   </head>
   <div class="containers">
     <div class="boxMyVocabPage">
       <button class="MyVocabPage font-thai" @click="goToMyVocabPage">
-        ค้นหาในคลังของฉัน
+        คลังของฉัน
       </button>
+      
+    </div>
+    <div class="boxMyVocabPage">
+      <input class="inp-username" type="text" value="NAMIDA KISUNE"/>
     </div>
 
     <!-- Search Section -->
@@ -108,7 +111,7 @@ const searchVocabulary = () => {
 
 .boxMyVocabPage {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .pd-boxtable{
@@ -122,6 +125,8 @@ const searchVocabulary = () => {
   overflow-y: auto;
 }
 
+
+
 .vocabulary-table {
   width: 100%;
   border-collapse: collapse;
@@ -130,7 +135,7 @@ const searchVocabulary = () => {
 
 .vocabulary-table th,
 .vocabulary-table td {
-  border: 3px solid #000;
+  border: 1px solid #000;
   padding: 12px;
 
 }
@@ -171,6 +176,8 @@ const searchVocabulary = () => {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+
+
 .btn-search {
   border: none;
   background-color: #F8F8FF;
@@ -187,11 +194,23 @@ const searchVocabulary = () => {
   transform: scale(1.1);
 }
 
+.inp-username {
+  padding: 10px 20px;
+  margin: 0 20px 0 20px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  margin-top: 10px;
+  text-align: right; 
+  font-family: 'Chakra Petch', sans-serif;
+}
+
+
 .MyVocabPage {
   justify-content: end;
   margin: 0 20px 0 20px;
   background-color: #3131A3;
-  width: 20%;
   color: white;
   padding: 10px 20px;
   border: none;

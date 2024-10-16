@@ -1,5 +1,5 @@
 <template>
-  <div class="container-sentOTP">
+  <div class="container-sentOTP font-thai">
     <div class="content">
       <h2 class="name-project">Hydrangea Project</h2>
       <div class="button-group">
@@ -34,11 +34,12 @@ const goToLoginPage = () => {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #06A6D0;
+  background: -webkit-linear-gradient(left, #fa4299, #06A6D0);
 }
 
 .content {
   background-color: white;
+  border-radius: 5px;
   padding: 40px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -110,6 +111,5 @@ const goToLoginPage = () => {
 
 .name-project {
   padding: 0 20px 0 20px;
-  /* เพิ่ม padding ที่ด้านล่าง */
 }
 </style>

@@ -8,7 +8,7 @@
             <h1>Register</h1>
             <div class="input-group">
                 <label for="email" class="label-email ">อีเมล</label>
-                <input id="email" class="inpmail font-thai" type="email" placeholder="กรอกอีเมลของคุณ" />
+                <input id="email" class="inp-mail font-thai" type="email" placeholder="กรอกอีเมลของคุณ" />
             </div>
             <button @click="goToLoginPage">Login</button>
         </div>
@@ -50,4 +50,5 @@ const goToLoginPage = () => {
     margin-bottom: 5px;
     color: #0C7294;
 }
+
 </style>
