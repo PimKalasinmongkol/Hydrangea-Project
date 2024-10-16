@@ -51,6 +51,10 @@
             </tr>
           </tbody>
         </table>
+        <!-- Button Logout -->
+      <div class="d-flex justify-content-end mt-3" style="position: absolute; bottom: 20px; right: 20px;">
+        <button class="btn-logout" @click="goTologinPage">ออกจากระบบ</button>
+      </div>
       </div>
     </div>
 
@@ -80,6 +84,10 @@ const filteredEntries = ref([...vocabularyEntries.value]); // เริ่มต
 
 const goToMyVocabPage = () => {
   router.push({ name: 'MyVocab' });
+};
+
+const goTologinPage = () => {
+  router.push({ name: 'Login' });
 };
 
 const searchVocabulary = () => {
@@ -278,4 +286,26 @@ const searchVocabulary = () => {
   color: red;
   font-weight: bold;
 }
+
+.btn-logout {
+  margin: 0 20px 0 20px;
+  background-color: #A33133;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-logout:hover {
+  background-color: #661f20;
+  transform: scale(1.05);
+}
+
+.btn-logout:active {
+  transform: scale(0.95);
+}
+
 </style>
