@@ -123,7 +123,7 @@ const searchVocabulary = () => {
 }
 
 .pd-boxtable{
-  padding: 3% 10% 0 10%;
+  padding: 1% 10% 0 10%;
 }
 
 .table-container {
