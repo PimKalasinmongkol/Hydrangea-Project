@@ -70,13 +70,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const router = useRouter();
+
+const checkToken = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await axios.post(
+      "http://localhost:3000/auth/session",
+      {
+        token: token,
+      }
+    );
+    if (!res.data.status) {
+      router.push({ name: "Login" });
+    }
+  } catch (error) {
+    router.push({ name: "Login" });
+  }
+};
+onMounted(() => {
+  checkToken();
+});
 
 const checkSession = async () => {
   const res = await axios.get('http://10.64.42.45:3000/auth/session');
@@ -90,7 +110,7 @@ const goToVocabularySourcePage = () => {
 
 const goTologinPage = () => {
       // ลบข้อมูล session หรือ token ที่เก็บไว้
-      localStorage.removeItem('userToken'); // ตัวอย่างการลบ token
+      localStorage.removeItem('token'); // ตัวอย่างการลบ token
 
       // แสดง SweetAlert เพื่อแจ้งว่าออกจากระบบสำเร็จ
       Swal.fire({

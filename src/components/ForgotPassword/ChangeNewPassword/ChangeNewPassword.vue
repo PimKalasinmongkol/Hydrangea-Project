@@ -111,7 +111,6 @@ const checkToken = async () => {
         otp: otp,
       }
     );
-    console.log(res.data);
     if (!res.data.status) {
       router.push({ name: "sentOTP" });
     }
@@ -185,6 +184,7 @@ const goToLoginPage = async () => {
       icon: "success",
       confirmButtonText: "ตกลง",
     }).then(() => {
+      localStorage.removeItem('otp');
       router.push({ name: "Login" });
     });
   } else {
@@ -194,6 +194,7 @@ const goToLoginPage = async () => {
       icon: "error",
       confirmButtonText: "ตกลง",
     }).then(() => {
+      localStorage.removeItem('otp');
       router.push({ name: "Login" });
     });
   }

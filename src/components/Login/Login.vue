@@ -127,18 +127,25 @@ export default defineComponent({
         return; // If password format is invalid, exit the function
       }
 
-
-      console.log('Logging in with:', loginForm.value);
-      // console.log(process.env.VUE_APP_ROOT_API)
-      const res = await axios.post('http://localhost:3000/auth/login', {
+      try{
+        const res = await axios.post('http://localhost:3000/auth/login', {
         email: loginForm.value.email,
         password: loginForm.value.password
       });
       if(res.data.status){
+        localStorage.setItem('token', res.data.token)
         Swal.fire('ยินดีต้อนรับ', 'เข้าสู่ระบบสำเร็จ', 'success').then(() => {
         router.push({ name: 'MyVocab' });
       });
       }else{
+        if(res.data.message == "Password expired."){
+          Swal.fire('รหัสผ่านของคุณหมดอายุ', 'กรุณาเปลี่ยนรหัสผ่าน', 'error');
+          router.push({ name: 'sentOTP' });
+        }else{
+          Swal.fire('ผิดพลาด', 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
+        }
+      }
+      }catch(error){
         Swal.fire('ผิดพลาด', 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
       }
     };
