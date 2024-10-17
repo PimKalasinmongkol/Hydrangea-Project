@@ -15,15 +15,24 @@
                 v-model="newPassword"
                 @input="checkPassword"
               />
-              <button type="button" class="toggle-btn font-thai" @click="togglePasswordVisibility">
+              <button
+                type="button"
+                class="toggle-btn font-thai"
+                @click="togglePasswordVisibility"
+              >
                 <transition name="fade">
-                  <font-awesome-icon :icon="showPassword ? 'eye-slash' : 'eye'" key="password-icon" />
+                  <font-awesome-icon
+                    :icon="showPassword ? 'eye-slash' : 'eye'"
+                    key="password-icon"
+                  />
                 </transition>
               </button>
             </div>
           </div>
 
-          <label for="confirm-password" class="label-password">ยืนยันรหัสผ่าน</label>
+          <label for="confirm-password" class="label-password"
+            >ยืนยันรหัสผ่าน</label
+          >
           <div class="password-toggle">
             <div class="box-inp">
               <input
@@ -33,38 +42,58 @@
                 placeholder="ยืนยันรหัสผ่านของคุณ"
                 v-model="confirmPassword"
               />
-              <button type="button" class="toggle-btn" @click="toggleConfirmPasswordVisibility">
+              <button
+                type="button"
+                class="toggle-btn"
+                @click="toggleConfirmPasswordVisibility"
+              >
                 <transition name="fade">
-                  <font-awesome-icon :icon="showConfirmPassword ? 'eye-slash' : 'eye'" key="confirm-password-icon" />
+                  <font-awesome-icon
+                    :icon="showConfirmPassword ? 'eye-slash' : 'eye'"
+                    key="confirm-password-icon"
+                  />
                 </transition>
               </button>
             </div>
           </div>
 
           <div class="new-password-hint">
-            <p :style="{ color: passwordLengthValid ? 'green' : 'red' }">มีความยาว 8-20 ตัว</p>
-            <p :style="{ color: uppercaseValid ? 'green' : 'red' }">มีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว</p>
-            <p :style="{ color: lowercaseValid ? 'green' : 'red' }">มีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว</p>
-            <p :style="{ color: digitValid ? 'green' : 'red' }">มีตัวเลขอย่างน้อย 1 ตัว</p>
-            <p :style="{ color: specialCharValid ? 'green' : 'red' }">มีเครื่องหมายพิเศษ (e.g., !@#$%^&*()_+=-)</p>
+            <p :style="{ color: passwordLengthValid ? 'green' : 'red' }">
+              มีความยาว 8-20 ตัว
+            </p>
+            <p :style="{ color: uppercaseValid ? 'green' : 'red' }">
+              มีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว
+            </p>
+            <p :style="{ color: lowercaseValid ? 'green' : 'red' }">
+              มีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว
+            </p>
+            <p :style="{ color: digitValid ? 'green' : 'red' }">
+              มีตัวเลขอย่างน้อย 1 ตัว
+            </p>
+            <p :style="{ color: specialCharValid ? 'green' : 'red' }">
+              มีเครื่องหมายพิเศษ (e.g., !@#$%^&*()_+=-)
+            </p>
           </div>
         </div>
-        <button class="btn-password font-thai" @click="goToLoginPage">เปลี่ยนรหัสผ่าน</button>
+        <button class="btn-password font-thai" @click="goToLoginPage">
+          เปลี่ยนรหัสผ่าน
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import Swal from 'sweetalert2';
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import Swal from "sweetalert2";
+import axios from "axios";
 
 const router = useRouter();
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
-const newPassword = ref('');
-const confirmPassword = ref('');
+const newPassword = ref("");
+const confirmPassword = ref("");
 
 // สถานะการตรวจสอบรหัสผ่าน
 const passwordLengthValid = ref(false);
@@ -73,6 +102,26 @@ const lowercaseValid = ref(false);
 const digitValid = ref(false);
 const specialCharValid = ref(false);
 
+const checkToken = async () => {
+  const otp = localStorage.getItem("otp");
+  try {
+    const res = await axios.post(
+      "http://localhost:3000/auth/resetpassword-otp-check",
+      {
+        otp: otp,
+      }
+    );
+    console.log(res.data);
+    if (!res.data.status) {
+      router.push({ name: "sentOTP" });
+    }
+  } catch (error) {
+    router.push({ name: "sentOTP" });
+  }
+};
+onMounted(() => {
+  checkToken();
+});
 // ฟังก์ชันตรวจสอบรหัสผ่าน
 const checkPassword = () => {
   const password = newPassword.value;
@@ -92,52 +141,72 @@ const toggleConfirmPasswordVisibility = () => {
 };
 
 const goToMyVocabPage = () => {
-  router.push({ name: 'MyVocab' });
+  router.push({ name: "MyVocab" });
 };
 
-const goToLoginPage = () => {
+const goToLoginPage = async () => {
   // ตรวจสอบว่ารหัสผ่านทั้งสองตรงกันและเป็นไปตามรูปแบบที่กำหนด
   if (newPassword.value !== confirmPassword.value) {
     Swal.fire({
-      title: 'รหัสผ่านไม่ตรงกัน!',
-      text: 'กรุณาตรวจสอบรหัสผ่านใหม่ของคุณอีกครั้ง',
-      icon: 'error',
-      confirmButtonText: 'ตกลง'
+      title: "รหัสผ่านไม่ตรงกัน!",
+      text: "กรุณาตรวจสอบรหัสผ่านใหม่ของคุณอีกครั้ง",
+      icon: "error",
+      confirmButtonText: "ตกลง",
     });
     return;
   }
 
   // ตรวจสอบว่า password pattern ทั้งหมดเป็นจริง
-  if (!passwordLengthValid.value || !uppercaseValid.value || !lowercaseValid.value || !digitValid.value || !specialCharValid.value) {
+  if (
+    !passwordLengthValid.value ||
+    !uppercaseValid.value ||
+    !lowercaseValid.value ||
+    !digitValid.value ||
+    !specialCharValid.value
+  ) {
     Swal.fire({
-      title: 'รหัสผ่านไม่ถูกต้อง!',
-      text: 'กรุณาตรวจสอบให้แน่ใจว่ารหัสผ่านของคุณตรงตามข้อกำหนด',
-      icon: 'error',
-      confirmButtonText: 'ตกลง'
+      title: "รหัสผ่านไม่ถูกต้อง!",
+      text: "กรุณาตรวจสอบให้แน่ใจว่ารหัสผ่านของคุณตรงตามข้อกำหนด",
+      icon: "error",
+      confirmButtonText: "ตกลง",
     });
     return;
   }
-
-  // ถ้าทั้งหมดถูกต้อง แจ้งเตือนความสำเร็จและไปยังหน้า login
-  Swal.fire({
-    title: 'เปลี่ยนรหัสผ่านสำเร็จ',
-    icon: 'success',
-    confirmButtonText: 'ตกลง'
-  }).then(() => {
-    router.push({ name: 'Login' });
+  const otp = localStorage.getItem("otp");
+  const res = await axios.post("http://localhost:3000/auth/resetpassword", {
+    otp: otp,
+    newPassword: newPassword.value,
+    confirmPassword: confirmPassword.value,
   });
+  if (res.data.status) {
+    // ถ้าทั้งหมดถูกต้อง แจ้งเตือนความสำเร็จและไปยังหน้า login
+    Swal.fire({
+      title: "เปลี่ยนรหัสผ่านสำเร็จ",
+      icon: "success",
+      confirmButtonText: "ตกลง",
+    }).then(() => {
+      router.push({ name: "Login" });
+    });
+  } else {
+    // ถ้าทั้งหมดถูกต้อง แจ้งเตือนความสำเร็จและไปยังหน้า login
+    Swal.fire({
+      title: "เปลี่ยนรหัสผ่านล้มเหลว",
+      icon: "error",
+      confirmButtonText: "ตกลง",
+    }).then(() => {
+      router.push({ name: "Login" });
+    });
+  }
 };
-
 </script>
 
 <style>
-
 .container-newpass {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: -webkit-linear-gradient(left, #fa4299, #06A6D0);
+  background: -webkit-linear-gradient(left, #fa4299, #06a6d0);
 }
 
 .content {
@@ -145,7 +214,7 @@ const goToLoginPage = () => {
   padding: 50px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
-  color: #0C7294;
+  color: #0c7294;
 }
 
 .password-group {
@@ -165,7 +234,7 @@ const goToLoginPage = () => {
 .label-password {
   font-size: 1rem;
   margin-bottom: 5px;
-  color: #0C7294;
+  color: #0c7294;
 }
 
 .button-group {
@@ -176,7 +245,7 @@ const goToLoginPage = () => {
   border-radius: 5px;
 }
 
-.box-inp{
+.box-inp {
   border: 2px solid #4d4d4d;
   justify-content: center;
   border-radius: 5px;
@@ -191,16 +260,16 @@ const goToLoginPage = () => {
   padding: 10px;
   outline: none;
   width: 100%;
-  background-color: #F8F8FF; 
+  background-color: #f8f8ff;
 }
 
 .toggle-btn {
   background: none;
   width: 40px;
   border: none;
-  color: #0C7294;
+  color: #0c7294;
   cursor: pointer;
-  background-color: #F8F8FF; 
+  background-color: #f8f8ff;
 }
 
 .toggle-btn:hover {
@@ -215,7 +284,7 @@ const goToLoginPage = () => {
   padding: 10px;
   transition: background-color 0.3s ease, transform 0.2s ease;
   width: 100%;
-  background-color: #3131A3;
+  background-color: #3131a3;
   color: white;
 }
 
@@ -238,12 +307,11 @@ const goToLoginPage = () => {
   opacity: 0;
 }
 
-.new-password-hint p{
+.new-password-hint p {
   display: flex;
   margin: 4px;
   flex-direction: column;
   justify-content: start;
   align-items: start;
 }
-
 </style>

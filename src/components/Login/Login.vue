@@ -130,7 +130,7 @@ export default defineComponent({
 
       console.log('Logging in with:', loginForm.value);
       // console.log(process.env.VUE_APP_ROOT_API)
-      const res = await axios.post('http://10.64.42.45:3000/auth/login', {
+      const res = await axios.post('http://localhost:3000/auth/login', {
         email: loginForm.value.email,
         password: loginForm.value.password
       });
@@ -205,7 +205,7 @@ export default defineComponent({
       }
     Swal.fire('Success', 'OTP sent to your email!', 'success');
     try {
-    await axios.post('http://10.64.42.45:3000/auth/getOTP', {
+    await axios.post('http://localhost:3000/auth/getOTP', {
       email: signupForm.value.email // ส่ง email ไปพร้อมกับคำขอในรูปแบบ JSON
     });
   } catch (error) {
@@ -213,7 +213,7 @@ export default defineComponent({
   }
     };
 
-    const handleSignup = () => {
+    const handleSignup = async () => {
       const { email, otp, password, confirmPassword } = signupForm.value;
 
       // ตรวจสอบ email
@@ -243,12 +243,24 @@ export default defineComponent({
         Swal.fire('Error', 'Passwords do not match!', 'error');
         return;
       }
-
-      Swal.fire('Success', 'Signup completed successfully!', 'success');
-      router.push({ name: 'Login' });
+      try{
+        const res = await axios.post('http://localhost:3000/auth/create', {
+          email: signupForm.value.email,
+          otp_password: signupForm.value.otp,
+          username: signupForm.value.username,
+          password: signupForm.value.password,
+          confirm_password: signupForm.value.confirmPassword
+        });
+        if(res.data.status){
+          Swal.fire('ยินดีด้วย', 'สร้างบัญชีสำเร็จ', 'success');
+          toggleForm();
+        }
+      }catch(error){
+        Swal.fire('กรุณาลองอีกครั้ง', 'สร้างบัญชีล้มเหลว', 'error');
+      }
     };
 
-    const handleForgotPassword = () => {
+    const handleForgotPassword = async() => {
       router.push({ name: 'sentOTP' });
     };
 

@@ -5,7 +5,7 @@
       <div class="button-group">
         <div class="email-group">
           <label for="email" class="label-email ">อีเมล</label>
-          <input id="email" class="inpmail font-thai" type="email" placeholder="กรอกอีเมลของคุณ" />
+          <input id="email" class="inpmail font-thai" type="email" placeholder="กรอกอีเมลของคุณ" v-model="inpEmail"/>
         </div>
         <button class="btn-otp font-thai" @click="goToConfirmOTPPage">รับ OTP</button>
         <button class="btn-back font-thai" @click="goToLoginPage">กลับไปหน้าเข้าสู่ระบบ</button>
@@ -17,10 +17,12 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
+import axios from 'axios';
+import { ref } from 'vue';
 
 const router = useRouter();
-
-const goToConfirmOTPPage = () => {
+const inpEmail = ref("");
+const goToConfirmOTPPage = async() => {
   Swal.fire({
         title: 'OTP ส่งสำเร็จ!',
         text: 'โปรดเช็คอีเมลของคุณ',
@@ -30,11 +32,19 @@ const goToConfirmOTPPage = () => {
         // หลังจากกด "ตกลง" จะเปลี่ยนไปยังหน้า ConfirmOTP
         router.push({ name: 'ConfirmOTP' });
       });
+  try {
+        await axios.post('http://localhost:3000/auth/getOTP', {
+        email: inpEmail.value // ส่ง email ไปพร้อมกับคำขอในรูปแบบ JSON
+      });
+    } catch (error) {
+      console.log(error)
+    }
 };
 
-const goToLoginPage = () => {
-  router.push({ name: 'Login' });
-};
+  const goToLoginPage = () => {
+    router.push({ name: 'Login' });
+  };
+
 </script>
 
 <style>

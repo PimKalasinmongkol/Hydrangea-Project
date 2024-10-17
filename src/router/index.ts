@@ -6,18 +6,12 @@ import ChangeNewPassword from '@/components/ForgotPassword/ChangeNewPassword/Cha
 import ConfirmOTP from '@/components/ForgotPassword/ConfirmOTP/ConfirmOTP.vue';
 import sentOTP from '@/components/ForgotPassword/sentOTP/sentOTP.vue';
 import Login from '@/components/Login/Login.vue';
-import Register from '@/components/Register/Register.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Login',
     component: Login,
-  },
-  {
-    path: '/Register',
-    name: 'Register',
-    component: Register
   },
   {
     path: '/My-Vocab',
