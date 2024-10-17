@@ -74,9 +74,15 @@ import { ref, computed, watch } from 'vue';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const router = useRouter();
 
+const checkSession = async () => {
+  const res = await axios.get('http://10.64.42.45:3000/auth/session');
+  console.log(res.data)
+}
+checkSession()
 const goToVocabularySourcePage = () => {
   router.push({ name: 'VocabularySource' });
 };
