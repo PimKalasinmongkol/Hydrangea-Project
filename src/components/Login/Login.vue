@@ -13,7 +13,7 @@
             <div class="field">
               <input type="text" v-model="loginForm.email" placeholder="อีเมล" />
             </div>
-            <div class="field">
+            <div class="field-inp-pass">
               <div class="box-inp-pass">
                 <input id="login-password" class="inp-password-login font-thai" v-model="loginForm.password"
                   placeholder="รหัสผ่าน" :type="showPassword ? 'text' : 'password'" />
@@ -286,13 +286,14 @@ export default defineComponent({
   background: none;
   width: 40px;
   border: none;
-  color: #0C7294;
+  border-radius: 30px;
+  color: #000000;
   cursor: pointer;
   background-color: #ffffff; 
 }
 
 .toggle-btn-pass:hover {
-  color: #21216a;
+  color: #535355;
 }
 
 .wrapper {
@@ -350,10 +351,6 @@ export default defineComponent({
   transition: all 0.4s ease;
 }
 
-.form-inner form .field input:focus {
-  border-color: #fc83bb;
-}
-
 .form-inner form .pass-link {
   margin-top: 5px;
   margin-left: 2px;
@@ -385,6 +382,29 @@ form .field input[type="submit"] {
   cursor: pointer;
   background: -webkit-linear-gradient(left, #3131A3, #fa4299);
 }
+
+.field-inp-pass{
+  height: 50px;
+  width: 100%;
+  margin-top: 20px;
+  border: 1px solid lightgrey;
+  border-bottom-width: 2px;
+  transition: all 0.4s ease;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1px;
+  
+}
+
+
+.field-inp-pass input{
+  border-radius: 10px;
+  padding-left: 15px;
+  font-size: 17px;
+  
+}
+
 
 .password-hint {
   display: flex;
