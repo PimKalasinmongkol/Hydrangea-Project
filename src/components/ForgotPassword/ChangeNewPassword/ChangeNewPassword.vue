@@ -6,23 +6,33 @@
         <div class="password-group">
           <label for="new-password" class="label-password">รหัสผ่านใหม่</label>
           <div class="password-toggle">
-
             <div class="box-inp">
-              <input id="new-password" class="inp-password font-thai" :type="showPassword ? 'text' : 'password'"
-                placeholder="กรอกรหัสผ่านของคุณ" />
+              <input
+                id="new-password"
+                class="inp-password font-thai"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="กรอกรหัสผ่านของคุณ"
+                v-model="newPassword"
+                @input="checkPassword"
+              />
               <button type="button" class="toggle-btn font-thai" @click="togglePasswordVisibility">
                 <transition name="fade">
                   <font-awesome-icon :icon="showPassword ? 'eye-slash' : 'eye'" key="password-icon" />
                 </transition>
               </button>
             </div>
-
           </div>
+
           <label for="confirm-password" class="label-password">ยืนยันรหัสผ่าน</label>
           <div class="password-toggle">
             <div class="box-inp">
-              <input id="confirm-password" class="inp-password font-thai" :type="showConfirmPassword ? 'text' : 'password'"
-                placeholder="ยืนยันรหัสผ่านของคุณ" />
+              <input
+                id="confirm-password"
+                class="inp-password font-thai"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                placeholder="ยืนยันรหัสผ่านของคุณ"
+                v-model="confirmPassword"
+              />
               <button type="button" class="toggle-btn" @click="toggleConfirmPasswordVisibility">
                 <transition name="fade">
                   <font-awesome-icon :icon="showConfirmPassword ? 'eye-slash' : 'eye'" key="confirm-password-icon" />
@@ -30,8 +40,16 @@
               </button>
             </div>
           </div>
+
+          <div class="new-password-hint">
+            <p :style="{ color: passwordLengthValid ? 'green' : 'red' }">มีความยาว 8-20 ตัว</p>
+            <p :style="{ color: uppercaseValid ? 'green' : 'red' }">มีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว</p>
+            <p :style="{ color: lowercaseValid ? 'green' : 'red' }">มีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว</p>
+            <p :style="{ color: digitValid ? 'green' : 'red' }">มีตัวเลขอย่างน้อย 1 ตัว</p>
+            <p :style="{ color: specialCharValid ? 'green' : 'red' }">มีเครื่องหมายพิเศษ (e.g., !@#$%^&*()_+=-)</p>
+          </div>
         </div>
-        <button class="btn-password font-thai" @click="goToMyVocabPage">เปลี่ยนรหัสผ่าน</button>
+        <button class="btn-password font-thai" @click="goToLoginPage">เปลี่ยนรหัสผ่าน</button>
       </div>
     </div>
   </div>
@@ -40,10 +58,30 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
+const newPassword = ref('');
+const confirmPassword = ref('');
+
+// สถานะการตรวจสอบรหัสผ่าน
+const passwordLengthValid = ref(false);
+const uppercaseValid = ref(false);
+const lowercaseValid = ref(false);
+const digitValid = ref(false);
+const specialCharValid = ref(false);
+
+// ฟังก์ชันตรวจสอบรหัสผ่าน
+const checkPassword = () => {
+  const password = newPassword.value;
+  passwordLengthValid.value = password.length >= 8 && password.length <= 20;
+  uppercaseValid.value = /[A-Z]/.test(password);
+  lowercaseValid.value = /[a-z]/.test(password);
+  digitValid.value = /\d/.test(password);
+  specialCharValid.value = /[!@#$%^&*()_+=-]/.test(password);
+};
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
@@ -58,9 +96,37 @@ const goToMyVocabPage = () => {
 };
 
 const goToLoginPage = () => {
-  router.push({ name: 'Login' });
-};
+  // ตรวจสอบว่ารหัสผ่านทั้งสองตรงกันและเป็นไปตามรูปแบบที่กำหนด
+  if (newPassword.value !== confirmPassword.value) {
+    Swal.fire({
+      title: 'รหัสผ่านไม่ตรงกัน!',
+      text: 'กรุณาตรวจสอบรหัสผ่านใหม่ของคุณอีกครั้ง',
+      icon: 'error',
+      confirmButtonText: 'ตกลง'
+    });
+    return;
+  }
 
+  // ตรวจสอบว่า password pattern ทั้งหมดเป็นจริง
+  if (!passwordLengthValid.value || !uppercaseValid.value || !lowercaseValid.value || !digitValid.value || !specialCharValid.value) {
+    Swal.fire({
+      title: 'รหัสผ่านไม่ถูกต้อง!',
+      text: 'กรุณาตรวจสอบให้แน่ใจว่ารหัสผ่านของคุณตรงตามข้อกำหนด',
+      icon: 'error',
+      confirmButtonText: 'ตกลง'
+    });
+    return;
+  }
+
+  // ถ้าทั้งหมดถูกต้อง แจ้งเตือนความสำเร็จและไปยังหน้า login
+  Swal.fire({
+    title: 'เปลี่ยนรหัสผ่านสำเร็จ',
+    icon: 'success',
+    confirmButtonText: 'ตกลง'
+  }).then(() => {
+    router.push({ name: 'Login' });
+  });
+};
 
 </script>
 
@@ -170,6 +236,14 @@ const goToLoginPage = () => {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.new-password-hint p{
+  display: flex;
+  margin: 4px;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
 }
 
 </style>

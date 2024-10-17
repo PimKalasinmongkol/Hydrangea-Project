@@ -1,6 +1,6 @@
 <!-- src/views/Home.vue -->
 <template>
-  <div class="main-container font-thai"> <!-- Container สำหรับจัดกลาง -->
+  <div class="main-container font-thai p-5"> <!-- Container สำหรับจัดกลาง -->
     <div class="container p-4">
       <div class="row">
         <div class="col-md-6">
@@ -73,6 +73,7 @@
 import { ref, computed, watch } from 'vue';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 
@@ -80,9 +81,20 @@ const goToVocabularySourcePage = () => {
   router.push({ name: 'VocabularySource' });
 };
 
+
 const goTologinPage = () => {
-  router.push({ name: 'Login' });
-};
+      // ลบข้อมูล session หรือ token ที่เก็บไว้
+      localStorage.removeItem('userToken'); // ตัวอย่างการลบ token
+
+      // แสดง SweetAlert เพื่อแจ้งว่าออกจากระบบสำเร็จ
+      Swal.fire({
+        title: 'ออกจากระบบสำเร็จ!',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      }).then(() => {
+        router.push({ name: 'Login' });
+      });
+    };
 
 const inputText1 = ref('');
 const inputText2 = ref('');
@@ -130,7 +142,14 @@ const submitText = () => {
       }
       messages.value[editIndex.value] = { ...message };
       editIndex.value = null; // รีเซ็ตตัวแปร index หลังแก้ไข
-      alert("บันทึกการแก้ไขแล้ว!");
+
+      // ใช้ SweetAlert2 เพื่อแจ้งเตือนว่า "บันทึกการแก้ไขแล้ว"
+      Swal.fire({
+        title: 'สำเร็จ!',
+        text: 'บันทึกการแก้ไขแล้ว!',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
     } else {
       const existingIndex = messages.value.findIndex(msg =>
         msg.correct === inputText1.value || msg.incorrect === inputText2.value
@@ -145,19 +164,39 @@ const submitText = () => {
           message.incorrect = inputText2.value;
         }
         messages.value[existingIndex] = { ...message };
-        alert("บันทึกการแก้ไขแล้ว!");
+
+        // SweetAlert2 แจ้งเตือนว่า "บันทึกการแก้ไขแล้ว"
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: 'บันทึกการแก้ไขแล้ว!',
+          icon: 'success',
+          confirmButtonText: 'ตกลง'
+        });
       } else {
         messages.value.push({
           correct: inputText1.value,
           incorrect: inputText2.value
         });
-        alert("บันทึกคำใหม่แล้ว!");
+
+        // SweetAlert2 แจ้งเตือนว่า "บันทึกคำใหม่แล้ว!"
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: 'บันทึกคำใหม่แล้ว!',
+          icon: 'success',
+          confirmButtonText: 'ตกลง'
+        });
       }
     }
     inputText1.value = '';
     inputText2.value = '';
   } else {
-    alert("กรุณากรอกข้อมูลทั้งสองช่อง");
+    // SweetAlert2 แจ้งเตือนว่า "กรุณากรอกข้อมูลทั้งสองช่อง"
+    Swal.fire({
+      title: 'ข้อผิดพลาด!',
+      text: 'กรุณากรอกข้อมูลทั้งสองช่อง',
+      icon: 'error',
+      confirmButtonText: 'ตกลง'
+    });
   }
 };
 
@@ -178,10 +217,36 @@ const exportToExcel = () => {
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Messages');
 
   XLSX.writeFile(workbook, 'vocabulary.xlsx');
+
+  Swal.fire({
+    title: 'สำเร็จ!',
+    text: 'ไฟล์ Excel ถูกบันทึกแล้ว: vocabulary.xlsx',
+    icon: 'success',
+    confirmButtonText: 'ตกลง'
+  });
 };
 
 const deleteMessage = (index: number) => {
-  messages.value.splice(index, 1); // ลบข้อความตาม index
+  // แสดง SweetAlert2 เพื่อให้ผู้ใช้ยืนยันก่อนลบ
+  Swal.fire({
+    title: 'คุณแน่ใจหรือไม่?',
+    text: 'คำนี้จะถูกลบและไม่สามารถกู้คืนได้!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'ใช่, ลบเลย!',
+    cancelButtonText: 'ยกเลิก'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      messages.value.splice(index, 1);
+      Swal.fire(
+        'ลบสำเร็จ!',
+        'คำนี้ได้ถูกลบแล้ว.',
+        'success'
+      );
+    }
+  });
 };
 
 const editMessage = (index: number) => {
@@ -210,35 +275,23 @@ const updateCorrectText = () => {
 <style scoped>
 .main-container {
   display: flex;
-  /* ใช้ Flexbox */
   justify-content: center;
-  /* จัดกลางแนวนอน */
   align-items: center;
-  /* จัดกลางแนวตั้ง */
   height: 100vh;
-  /* ความสูงของ container ครอบคลุมทั้งหน้าจอ */
   background-image: url(https://img5.pic.in.th/file/secure-sv1/Hydrangea.jpg);
-  /* เพิ่มภาพพื้นหลัง */
   background-size: cover;
-  /* ปรับขนาดให้ครอบคลุมเต็มหน้าจอ */
   background-position: center;
-  /* จัดตำแหน่งให้ภาพอยู่ตรงกลาง */
   background-repeat: no-repeat;
-  /* ไม่ให้ภาพซ้ำ */
 }
 
 .container {
   margin: auto;
-  /* ใช้ margin auto เพื่อให้อยู่กลาง */
   padding: 20px;
-  margin-top: 40px;
+  margin-top: 50px;
   background-color: rgba(30, 24, 24, 0.5);
-  /* เพิ่มพื้นหลังโปร่งแสงเพื่อให้มองเห็นภาพพื้นหลัง */
   max-width: 100vh;
-  /* เพิ่มความกว้างเป็น 1000px */
-  height: 90vh;
+  height: 80vh;
   width: 100%;
-  /* ให้กว้างเต็มพื้นที่ */
 }
 
 .inp-username {
@@ -254,12 +307,9 @@ const updateCorrectText = () => {
 }
 
 .table-container {
-  max-height: 350px;
-  /* กำหนดความสูงสูงสุดให้กับตาราง */
+  max-height: 480px;
   overflow-y: auto;
-  /* ทำให้สามารถเลื่อนแนวตั้งได้ */
   margin-top: 20px;
-  /* เพิ่มระยะห่างให้กับตาราง */
 
 }
 
@@ -272,37 +322,26 @@ thead th {
   position: sticky;
   top: 0;
   color: white;
-  /* เปลี่ยนสีตัวอักษรของหัวตาราง */
   z-index: 1;
 }
 
 .correct-header {
   background-color: #4CAF50;
-  /* สีเขียวสำหรับคำที่ถูกต้อง */
   color: white;
 }
 
 .incorrect-header {
   background-color: #f44336;
-  /* สีแดงสำหรับคำที่ชอบเขียนผิด */
   color: white;
 }
 
 .manage-header {
   background-color: #566667;
-  /* สีสำหรับการจัดการ */
   color: white;
 }
 
 .table {
   width: 100%;
-  /* ให้ตารางกว้างเต็มที่ */
-
-}
-
-tbody tr:hover {
-  background-color: #f1f1f1;
-  /* เปลี่ยนสีเมื่อเมาส์อยู่เหนือแถว */
 }
 
 .btn-vocabsoure {
