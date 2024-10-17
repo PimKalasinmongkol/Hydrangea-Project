@@ -1,9 +1,9 @@
 <template>
-  <div class="container-login">
+  <div class="container-login font-thai">
     <div class="wrapper">
       <div class="title-text">
-        <div v-if="isLogin" class="title login">Login Form</div>
-        <div v-else class="title signup">Signup Form</div>
+        <div v-if="isLogin" class="title login">Hydrangea Project</div>
+        <div v-else class="title signup">สมัครสมาชิก</div>
       </div>
       <div class="form-container">
         <div class="form-inner">
@@ -11,51 +11,67 @@
           <!-- Login Form -->
           <form v-if="isLogin" @submit.prevent="handleLogin">
             <div class="field">
-              <input type="email" v-model="loginForm.email" placeholder="Email Address" required />
+              <input type="text" v-model="loginForm.email" placeholder="อีเมล" />
             </div>
             <div class="field">
-              <input type="password" v-model="loginForm.password" placeholder="Password" required />
+              <div class="box-inp-pass">
+                <input id="login-password" class="inp-password-login font-thai" v-model="loginForm.password"
+                  placeholder="รหัสผ่าน" :type="showPassword ? 'text' : 'password'" />
+                <button type="button" class="toggle-btn-pass" @click="togglePasswordVisibility">
+                  <transition name="fade">
+                    <font-awesome-icon :icon="showPassword ? 'eye-slash' : 'eye'" key="password-icon" />
+                  </transition>
+                </button>
+              </div>
             </div>
+
             <div class="pass-link">
-              <a href="#" @click.prevent="handleForgotPassword">Forgot Password?</a>
+              <a href="#" @click.prevent="handleForgotPassword">ลืมรหัสผ่าน?</a>
             </div>
             <div class="field">
-              <input type="submit" value="Login" />
+              <input type="submit" value="เข้าสู่ระบบ" />
             </div>
             <div class="signup-link">
-              Not a member? <a href="#" @click.prevent="toggleForm">Create Account</a>
+              <a href="#" @click.prevent="toggleForm">สร้างบัญชีใหม่</a>
             </div>
           </form>
 
           <!-- Signup Form -->
           <form v-else @submit.prevent="handleSignup">
             <div class="field">
-              <input type="text" v-model="signupForm.username" placeholder="Username" required />
+              <input type="text" v-model="signupForm.username" placeholder="ชื่อผู้ใช้" required />
             </div>
             <div class="field">
-              <input type="email" v-model="signupForm.email" placeholder="Email Address" required />
+              <input type="email" v-model="signupForm.email" placeholder="อีเมล" required />
             </div>
             <div class="field">
-              <input type="text" v-model="signupForm.otp" placeholder="Enter OTP" required />
+              <input type="text" v-model="signupForm.otp" placeholder="กรอก OTP 6 หลัก" required />
             </div>
             <div class="field">
-              <input type="submit" value="Sent OTP" />
+              <input type="submit" :value="isOtpSent ? 'ส่ง OTP อีกครั้ง' : 'ส่ง OTP '" :disabled="isOtpSent"
+                @click.prevent="sendOtp" />
             </div>
             <div class="field">
-              <input type="password" v-model="signupForm.password" placeholder="Password" required />
+              <input type="password" v-model="signupForm.password" @input="checkPassword" placeholder="กรอกรหัสผ่าน"
+                required />
             </div>
             <div class="field">
-              <input type="password" v-model="signupForm.confirmPassword" placeholder="Confirm Password" required />
+              <input type="password" v-model="signupForm.confirmPassword" placeholder="ยืนยันรหัสผ่าน" required />
+            </div>
+            <div class="password-hint">
+              <p :style="{ color: passwordLengthValid ? 'green' : 'red' }">มีความยาว 8-20 ตัว</p>
+              <p :style="{ color: uppercaseValid ? 'green' : 'red' }">มีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว</p>
+              <p :style="{ color: lowercaseValid ? 'green' : 'red' }">มีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว</p>
+              <p :style="{ color: digitValid ? 'green' : 'red' }">มีตัวเลขอย่างน้อย 1 ตัว</p>
+              <p :style="{ color: specialCharValid ? 'green' : 'red' }">มีเครื่องหมายพิเศษ (e.g., !@#$%^&*()_+=-)</p>
             </div>
             <div class="field">
-              <input type="submit" value="Sign Up" />
+              <input type="submit" value="สร้างบัญชี" />
             </div>
             <div class="signup-link">
-              Already a member? <a href="#" @click.prevent="toggleForm">Login</a>
+              <a href="#" @click.prevent="toggleForm">กลับไปหน้าเข้าสู่ระบบ</a>
             </div>
           </form>
-
-
         </div>
       </div>
     </div>
@@ -66,7 +82,6 @@
 import { defineComponent, ref } from 'vue';
 import Swal from 'sweetalert2'; // นำเข้า sweetalert2
 import { useRouter } from 'vue-router';
-
 
 export default defineComponent({
   name: 'LoginSignup',
@@ -87,16 +102,50 @@ export default defineComponent({
       confirmPassword: ''
     });
 
+    const isOtpSent = ref(false);
+
+    // สถานะการตรวจสอบรหัสผ่าน
+    const passwordLengthValid = ref(false);
+    const uppercaseValid = ref(false);
+    const lowercaseValid = ref(false);
+    const digitValid = ref(false);
+    const specialCharValid = ref(false);
+
     const toggleForm = () => {
       isLogin.value = !isLogin.value;
     };
 
-
     const handleLogin = () => {
+      // Check if the email format is valid
+      if (!emailPattern.test(loginForm.value.email)) {
+        Swal.fire('Error', 'Invalid email format!', 'error');
+        return;
+      }
+
+      // Check if the password format is valid
+      if (!checkLoginPassword()) {
+        return; // If password format is invalid, exit the function
+      }
+
 
       console.log('Logging in with:', loginForm.value);
-      router.push({ name: 'MyVocab' });
+
+      Swal.fire('Success', 'Login successful!', 'success').then(() => {
+        router.push({ name: 'MyVocab' });
+      });
     };
+
+    const checkLoginPassword = () => {
+      const password = loginForm.value.password;
+
+      // ตรวจสอบรหัสผ่านตามรูปแบบที่กำหนด
+      if (!passwordPattern.test(password)) {
+        Swal.fire('Error', 'Password must be between 8 to 20 characters, include letters, numbers, and special characters!', 'error');
+        return false;
+      }
+      return true;
+    };
+
 
 
     // ตรวจสอบรูปแบบ (Pattern) ของ Email
@@ -106,7 +155,44 @@ export default defineComponent({
     // ตรวจสอบรูปแบบของ Password (ระหว่าง 8-20 ตัวอักษร สามารถมีทั้งตัวเลข ตัวอักษร และอักขระพิเศษ)
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=-]{8,20}$/;
 
+    const checkPassword = () => {
+      const password = signupForm.value.password;
+      passwordLengthValid.value = password.length >= 8 && password.length <= 20;
+      uppercaseValid.value = /[A-Z]/.test(password);
+      lowercaseValid.value = /[a-z]/.test(password);
+      digitValid.value = /\d/.test(password);
+      specialCharValid.value = /[!@#$%^&*()_+=-]/.test(password);
+      // Example validation checks, you can adjust these as needed
+      if (!passwordPattern) {
+        Swal.fire('Error', 'Password must be between 8 to 20 characters, include letters, numbers, and special characters!', 'error');
+      }
+    };
 
+    const sendOtp = () => {
+      // Check if the email is provided
+      if (!signupForm.value.email) {
+        Swal.fire('Error', 'Please enter your email address!', 'error');
+        return;
+      }
+
+      // Check if OTP has already been sent
+      if (isOtpSent.value) {
+        Swal.fire('Info', 'Please wait 30 seconds before resending the OTP.', 'info');
+        return;
+      }
+
+      // Disable the OTP button
+      isOtpSent.value = true;
+
+      // Simulate sending the OTP (replace with your actual OTP sending logic)
+      console.log('Sending OTP to:', signupForm.value.email);
+      Swal.fire('Success', 'OTP sent to your email!', 'success');
+
+      // Start the 30-second timer
+      setTimeout(() => {
+        isOtpSent.value = false; // Re-enable the button after 30 seconds
+      }, 30000);
+    };
 
     const handleSignup = () => {
       const { email, otp, password, confirmPassword } = signupForm.value;
@@ -125,7 +211,11 @@ export default defineComponent({
 
       // ตรวจสอบ Password
       if (!passwordPattern.test(password)) {
-        Swal.fire('Error', 'Password must be between 8 to 20 characters and include letters, numbers, and special characters!', 'error');
+        Swal.fire(
+          'Error',
+          'Password must be between 8 to 20 characters, include letters, numbers, and special characters!',
+          'error'
+        );
         return;
       }
 
@@ -139,23 +229,40 @@ export default defineComponent({
       router.push({ name: 'Login' });
     };
 
-
     const handleForgotPassword = () => {
       router.push({ name: 'sentOTP' });
+    };
+
+    const showPassword = ref(false); // เพิ่มตัวแปรเพื่อจัดการการแสดงรหัสผ่าน
+
+    const togglePasswordVisibility = () => {
+      showPassword.value = !showPassword.value; // เปลี่ยนสถานะการแสดงรหัสผ่าน
     };
 
     return {
       isLogin,
       loginForm,
       signupForm,
+      isOtpSent,
       toggleForm,
-      handleLogin,
+      checkPassword,
+      passwordLengthValid,
+      uppercaseValid,
+      lowercaseValid,
+      digitValid,
+      specialCharValid,
       handleSignup,
-      handleForgotPassword
+      sendOtp,
+      handleForgotPassword,
+      handleLogin,
+      showPassword,
+      togglePasswordVisibility,
     };
   }
 });
 </script>
+
+
 
 
 
@@ -171,6 +278,19 @@ export default defineComponent({
   background: -webkit-linear-gradient(left, #3131A3, #fa4299);
 }
 
+.toggle-btn-pass {
+  background: none;
+  width: 40px;
+  border: none;
+  color: #0C7294;
+  cursor: pointer;
+  background-color: #ffffff; 
+}
+
+.toggle-btn-pass:hover {
+  color: #21216a;
+}
+
 .wrapper {
   width: 400px;
   background: #fff;
@@ -184,6 +304,15 @@ export default defineComponent({
   width: 200%;
 }
 
+.inp-password-login {
+  font-size: 16px;
+  border: none;
+  padding: 10px;
+  outline: none;
+  width: 100%;
+  background-color: #ffffff; 
+}
+
 .wrapper .title-text .title {
   width: 50%;
   font-size: 35px;
@@ -193,6 +322,10 @@ export default defineComponent({
 
 .wrapper .form-container {
   width: 100%;
+}
+
+.box-inp-pass{
+  display: flex;
 }
 
 .form-inner form .field {
@@ -247,5 +380,17 @@ form .field input[type="submit"] {
   border: none;
   cursor: pointer;
   background: -webkit-linear-gradient(left, #3131A3, #fa4299);
+}
+
+.password-hint {
+  display: flex;
+  padding: 10px 10px 0 10px;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+}
+
+p {
+  margin: 3px;
 }
 </style>
