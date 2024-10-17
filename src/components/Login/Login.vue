@@ -141,6 +141,9 @@ export default defineComponent({
         if(res.data.message == "Password expired."){
           Swal.fire('รหัสผ่านของคุณหมดอายุ', 'กรุณาเปลี่ยนรหัสผ่าน', 'error');
           router.push({ name: 'sentOTP' });
+        } else if (res.data.message == "Login failure continuing 5 times") {
+          Swal.fire('คุณกรอกรหัสผ่านผิดเกินจำนวนครั้งที่กำหนด', 'กรุณาเปลี่ยนรหัสผ่าน', 'error');
+          router.push({ name: 'sentOTP' });
         }else{
           Swal.fire('ผิดพลาด', 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
         }
