@@ -81,6 +81,7 @@
 import { defineComponent, ref } from 'vue';
 import Swal from 'sweetalert2'; // นำเข้า sweetalert2
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'LoginSignup',
@@ -114,7 +115,7 @@ export default defineComponent({
       isLogin.value = !isLogin.value;
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
       // Check if the email format is valid
       if (!emailPattern.test(loginForm.value.email)) {
         Swal.fire('Error', 'Invalid email format!', 'error');
@@ -128,10 +129,18 @@ export default defineComponent({
 
 
       console.log('Logging in with:', loginForm.value);
-
-      Swal.fire('Success', 'Login successful!', 'success').then(() => {
+      // console.log(process.env.VUE_APP_ROOT_API)
+      const res = await axios.post('http://10.64.42.45:3000/auth/login', {
+        email: loginForm.value.email,
+        password: loginForm.value.password
+      });
+      if(res.data.status){
+        Swal.fire('ยินดีต้อนรับ', 'เข้าสู่ระบบสำเร็จ', 'success').then(() => {
         router.push({ name: 'MyVocab' });
       });
+      }else{
+        Swal.fire('ผิดพลาด', 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
+      }
     };
 
     const checkLoginPassword = () => {
@@ -193,8 +202,15 @@ export default defineComponent({
             countdown.value = 30;
           }
         }, 1000 * (31 - i)); // Multiplies the delay based on the loop index
-    }
+      }
     Swal.fire('Success', 'OTP sent to your email!', 'success');
+    try {
+    await axios.post('http://10.64.42.45:3000/auth/getOTP', {
+      email: signupForm.value.email // ส่ง email ไปพร้อมกับคำขอในรูปแบบ JSON
+    });
+  } catch (error) {
+    console.log(error)
+  }
     };
 
     const handleSignup = () => {
