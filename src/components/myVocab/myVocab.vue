@@ -58,7 +58,7 @@
       </div>
 
       <div class="d-flex justify-content-end mt-3" style="position: absolute; top: 80px; right: 20px;">
-        <input class="inp-username" type="text" value="NAMIDA KISUNE"/>
+        <input class="inp-username" type="text" :value="username" readonly="true"/>
       </div>
 
       <!-- Button Logout -->
@@ -77,7 +77,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const router = useRouter();
-
+const username = ref<string>('')
 const checkToken = async () => {
   const token = localStorage.getItem("token");
   try {
@@ -90,6 +90,7 @@ const checkToken = async () => {
     if (!res.data.status) {
       router.push({ name: "Login" });
     }
+    username.value = res.data.username
   } catch (error) {
     router.push({ name: "Login" });
   }
@@ -98,11 +99,12 @@ onMounted(() => {
   checkToken();
 });
 
-const checkSession = async () => {
-  const res = await axios.get('http://10.64.42.45:3000/auth/session');
-  console.log(res.data)
-}
-checkSession()
+// const checkSession = async () => {
+//   const res = await axios.get('http://10.64.42.45:3000/auth/session');
+//   // username.value = res.data.username
+//   console.log(res.data)
+// }
+// checkSession()
 const goToVocabularySourcePage = () => {
   router.push({ name: 'VocabularySource' });
 };

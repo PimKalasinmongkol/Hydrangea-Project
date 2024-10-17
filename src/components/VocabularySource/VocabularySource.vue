@@ -11,7 +11,7 @@
         </button>
       </div>
       <div class="boxMyVocabPage">
-        <input class="inp-username" type="text" value="NAMIDA KISUNE" />
+        <input class="inp-username" type="text" :value="username" readonly="true" />
       </div>
 
       <!-- Search Section -->
@@ -70,7 +70,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const router = useRouter();
-
+const username = ref<string>('')
 const checkToken = async () => {
   const token = localStorage.getItem("token");
   try {
@@ -83,6 +83,7 @@ const checkToken = async () => {
     if (!res.data.status) {
       router.push({ name: "Login" });
     }
+    username.value = res.data.username
   } catch (error) {
     router.push({ name: "Login" });
   }
