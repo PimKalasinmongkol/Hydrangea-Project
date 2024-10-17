@@ -1,69 +1,71 @@
 <template>
-  <head>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
-  </head>
-  <div class="containers">
-    <div class="boxMyVocabPage">
-      <button class="MyVocabPage font-thai" @click="goToMyVocabPage">
-        คลังของฉัน
-      </button>
-      
-    </div>
-    <div class="boxMyVocabPage">
-      <input class="inp-username" type="text" value="NAMIDA KISUNE"/>
-    </div>
-
-    <!-- Search Section -->
-    <div class="widthboxsearch">
-      <div class="d-flex justify-center">
-        <p class="search-label titlesearch">ค้นหาในคลังคำศัพท์รวม</p>
+  <div> <!-- เพิ่ม root element ที่นี่ -->
+    <head>
+      <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <div class="containers">
+      <div class="boxMyVocabPage">
+        <button class="MyVocabPage font-thai" @click="goToMyVocabPage">
+          คลังของฉัน
+        </button>
       </div>
-      <div class="d-flex justify-center">
-        <div class="d-flex justify-center widthsearch">
-          <input class="justify-center inpsearch" type="text" v-model="searchQuery"
-            placeholder="กรุณากรอกคำศัพท์ที่คุณต้องการหา" />
-          <button class="btn-search" @click="searchVocabulary">
-            <font-awesome-icon icon="search" class="d-flex justify-center search-icon" />
-          </button>
+      <div class="boxMyVocabPage">
+        <input class="inp-username" type="text" value="NAMIDA KISUNE"/>
+      </div>
+
+      <!-- Search Section -->
+      <div class="widthboxsearch">
+        <div class="d-flex justify-center">
+          <p class="search-label titlesearch">ค้นหาในคลังคำศัพท์รวม</p>
+        </div>
+        <div class="d-flex justify-center">
+          <div class="d-flex justify-center widthsearch">
+            <input class="justify-center inpsearch" type="text" v-model="searchQuery"
+              placeholder="กรุณากรอกคำศัพท์ที่คุณต้องการหา" />
+            <button class="btn-search" @click="searchVocabulary">
+              <font-awesome-icon icon="search" class="d-flex justify-center search-icon" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Section -->
+      <div class="d-flex justify-center pd-boxtable">
+        <div class="table-container">
+          <table class="vocabulary-table font-thai">
+            <thead>
+              <tr>
+                <th class="correct">คำถูก</th>
+                <th class="incorrect">คำผิด</th>
+                <th class="correct">ผู้เผยแพร่</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(entry, index) in filteredEntries" :key="index">
+                <td>{{ entry.correctWord }}</td>
+                <td>{{ entry.wrongWords.join(', ') }}</td>
+                <td>{{ entry.publisher }}</td>
+              </tr>
+              <tr v-if="filteredEntries.length === 0">
+                <td colspan="3" class="no-results">ไม่พบผลลัพธ์ที่ตรงกัน</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- Button Logout -->
+          <div class="d-flex justify-content-end mt-3" style="position: absolute; bottom: 20px; right: 20px;">
+            <button class="btn-logout" @click="goTologinPage">ออกจากระบบ</button>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- Table Section -->
-    <div class="d-flex justify-center pd-boxtable">
-      <div class="table-container">
-        <table class="vocabulary-table font-thai">
-          <thead>
-            <tr>
-              <th class="correct">คำถูก</th>
-              <th class="incorrect">คำผิด</th>
-              <th class="correct">ผู้เผยแพร่</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(entry, index) in filteredEntries" :key="index">
-              <td>{{ entry.correctWord }}</td>
-              <td>{{ entry.wrongWords.join(', ') }}</td>
-              <td>{{ entry.publisher }}</td>
-            </tr>
-            <tr v-if="filteredEntries.length === 0">
-              <td colspan="3" class="no-results">ไม่พบผลลัพธ์ที่ตรงกัน</td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- Button Logout -->
-      <div class="d-flex justify-content-end mt-3" style="position: absolute; bottom: 20px; right: 20px;">
-        <button class="btn-logout" @click="goTologinPage">ออกจากระบบ</button>
-      </div>
-      </div>
-    </div>
-
-  </div>
+  </div> <!-- ปิด root element ที่นี่ -->
 </template>
+
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -87,8 +89,18 @@ const goToMyVocabPage = () => {
 };
 
 const goTologinPage = () => {
-  router.push({ name: 'Login' });
-};
+      // ลบข้อมูล session หรือ token ที่เก็บไว้
+      localStorage.removeItem('userToken'); // ตัวอย่างการลบ token
+
+      // แสดง SweetAlert เพื่อแจ้งว่าออกจากระบบสำเร็จ
+      Swal.fire({
+        title: 'ออกจากระบบสำเร็จ!',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      }).then(() => {
+        router.push({ name: 'Login' });
+      });
+    };
 
 const searchVocabulary = () => {
   // ค้นหาคำศัพท์เมื่อกดปุ่มค้นหา

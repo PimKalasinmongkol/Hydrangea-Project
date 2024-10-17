@@ -17,7 +17,7 @@
               <input type="password" v-model="loginForm.password" placeholder="Password" required />
             </div>
             <div class="pass-link">
-              <a href="#" @click.prevent="handleForgotPassword">Forgot Password?</a> <!-- เรียกใช้ฟังก์ชันนี้ -->
+              <a href="#" @click.prevent="handleForgotPassword">Forgot Password?</a> 
             </div>
             <div class="field">
               <input type="submit" value="Login" />
@@ -30,23 +30,41 @@
           <!-- Signup Form -->
           <form v-else @submit.prevent="handleSignup">
             <div class="field">
-              <input type="text" v-model="signupForm.email" placeholder="Username" required />
+              <input type="text" v-model="signupForm.username" placeholder="Username" />
             </div>
             <div class="field">
-              <input type="text" v-model="signupForm.email" placeholder="Email Address" required />
+              <input type="text" v-model="signupForm.email" placeholder="Email Address"  />
             </div>
             <div class="field">
-              <input type="text" v-model="signupForm.otp" placeholder="Enter OTP" required />
+              <input type="text" v-model="signupForm.otp" placeholder="Enter OTP"  />
             </div>
             <div class="field">
-              <input type="submit" value="Sent OTP" />
+              <input type="buttonSendOTP" @click="sendOtp" value="Send OTP" /> <!-- Change to button to call sendOtp -->
             </div>
-            <div class="field">
-              <input type="password" v-model="signupForm.password" placeholder="Password" required />
+            <div class="field password-field">
+              <input :type="showPassword ? 'text' : 'password'" v-model="signupForm.password" placeholder="Password" />
+              <span class="eye" @click="showPassword = !showPassword">
+                <i :class="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+              </span>
             </div>
-            <div class="field">
-              <input type="password" v-model="signupForm.password" placeholder="Confirm Password" required />
+            
+            <div class="field password-field">
+              <input :type="showConfirmPassword ? 'text' : 'password'" v-model="signupForm.confirmPassword" placeholder="Confirm Password" />
+              <span class="eye" @click="showConfirmPassword = !showConfirmPassword">
+                <i :class="showConfirmPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+              </span>
             </div>
+             <!-- Message showing password requirements -->
+             <div class="password-requirements" :class="{ valid: isPasswordValid }">
+              <ul>
+                <p>มีความยาวอย่างน้อย 8 ตัว</p>
+                <p>มีตัวอักษรพิมพ์เล็กอย่างน้อย 1 ตัว</p>
+                <p>มีตัวอักษรพิมพ์ใหญ่อย่างน้อย 1 ตัว</p>
+                <p>มีตัวเลขอย่างน้อย 1 ตัว</p>
+                <p>มีเครื่องหมายพิเศษ เช่น @#?!%$ อย่างน้อย 1 ตัว</p>
+              </ul>
+            </div>
+            
             <div class="field">
               <input type="submit" value="Sign Up" />
             </div>
@@ -62,13 +80,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 export default defineComponent({
   name: 'LoginSignup',
   setup() {
-    const router = useRouter(); // ใช้ router
+    const router = useRouter();
     const isLogin = ref(true);
 
     const loginForm = ref({
@@ -84,45 +103,91 @@ export default defineComponent({
       confirmPassword: ''
     });
 
- // สลับระหว่างฟอร์ม Login และ Signup
- const toggleForm = () => {
+    const toggleForm = () => {
       isLogin.value = !isLogin.value;
     };
 
-    // ฟังก์ชัน Login
     const handleLogin = () => {
-      // จำลองการเข้าสู่ระบบ
       console.log('Logging in with:', loginForm.value);
       router.push({ name: 'MyVocab' });
     };
 
-    // ฟังก์ชัน Signup
-    const handleSignup = () => {
-      console.log('Signing up with:', signupForm.value);
-      if (signupForm.value.password !== signupForm.value.confirmPassword) {
-        alert('Passwords do not match!');
-        return;
-      }
-      // เมื่อ Sign Up สำเร็จ ให้ไปยังหน้า Login
-      router.push({ name: 'Login' });
-    };
+const handleSignup = () => {
+  console.log('Signing up with:', signupForm.value);
 
-    // ส่ง OTP ไปยังผู้ใช้
-    const sendOtp = () => {
-      console.log('Sending OTP to:', signupForm.value.email);
-      // เพิ่มฟังก์ชันสำหรับส่ง OTP ที่นี่
-    };
+  // ตรวจสอบว่ามีการกรอกข้อมูลครบทุกช่อง
+  if (!signupForm.value.username || !signupForm.value.email || !signupForm.value.otp || 
+      !signupForm.value.password || !signupForm.value.confirmPassword) {
+    Swal.fire({
+      title: 'ข้อผิดพลาด!',
+      text: 'กรุณากรอกข้อมูลให้ครบทุกช่อง',
+      icon: 'error',
+      confirmButtonText: 'ตกลง'
+    });
+    return;
+  }
 
-    // ฟังก์ชัน Forgot Password
+  // ตรวจสอบรหัสผ่านว่าตรงกันหรือไม่
+  if (signupForm.value.password !== signupForm.value.confirmPassword) {
+    Swal.fire({
+      title: 'ข้อผิดพลาด!',
+      text: 'รหัสผ่านไม่ตรงกัน',
+      icon: 'error',
+      confirmButtonText: 'ตกลง'
+    });
+    return;
+  }
+// ตรวจสอบความต้องการรหัสผ่าน
+const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#?!%$]).{8,}$/;
+
+  if (!passwordRequirements.test(signupForm.value.password)) {
+    Swal.fire({
+      title: 'ข้อผิดพลาด!',
+      text: 'รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร และต้องมีตัวพิมพ์เล็ก ตัวพิมพ์ใหญ่ ตัวเลข และเครื่องหมายพิเศษอย่างน้อย 1 ตัว',
+      icon: 'error',
+      confirmButtonText: 'ตกลง'
+    });
+    return;
+  }
+
+  // ถ้าทุกอย่างถูกต้อง
+  Swal.fire({
+    title: 'สำเร็จ!',
+    text: 'สมัครสมาชิกสำเร็จ',
+    icon: 'success',
+    confirmButtonText: 'ตกลง'
+  }).then(() => {
+    // เมื่อกดปุ่ม OK จะเปลี่ยนไปหน้า Login
+    router.push({ name: 'Login' }); // นำทางไปยังหน้า Login
+  });
+
+};
+
+// ส่ง OTP ไปยังผู้ใช้
+const sendOtp = () => {
+  if (signupForm.value.username && signupForm.value.email) {
+    console.log('Sending OTP to:', signupForm.value.email);
+    // Implement OTP sending logic here, e.g., API call
+    Swal.fire({
+      title: 'สำเร็จ!',
+      text: 'OTP ถูกส่งไปยังอีเมลของคุณ',
+      icon: 'success',
+      confirmButtonText: 'ตกลง'
+    });
+    } else {
+      Swal.fire({
+        title: 'ข้อผิดพลาด!',
+        text: 'กรุณากรอก Username และ Email ก่อนส่ง OTP',
+        icon: 'error',
+        confirmButtonText: 'ตกลง'
+      });
+    }
+};
+
     const handleForgotPassword = () => {
       router.push({ name: 'sentOTP' });
     };
 
-    // นำทางไปยังหน้า Login หลังจาก Sign Up สำเร็จ
-    const navigateToLogin = () => {
-      isLogin.value = true;  // เปลี่ยนสถานะเป็น Login
-      router.push({ name: 'Login' });  // ไปยังหน้า Login
-    };
 
     return {
       isLogin,
@@ -131,11 +196,13 @@ export default defineComponent({
       toggleForm,
       handleLogin,
       handleSignup,
+      sendOtp,
       handleForgotPassword
     };
   }
 });
 </script>
+
 
 
 
@@ -229,4 +296,32 @@ form .field input[type="submit"] {
   cursor: pointer;
   background: -webkit-linear-gradient(left, #3131A3, #fa4299);
 }
+
+form .field input[type="buttonSendOTP"] {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 500;
+  padding: 0; /* เปลี่ยนจาก padding-left เป็น padding: 0; */
+  border: none;
+  cursor: pointer;
+  background: -webkit-linear-gradient(left, #3131A3, #fa4299);
+  width: 100%; /* ให้ปุ่มกว้างเต็มที่ */
+  text-align: center; /* ทำให้ข้อความอยู่กลางปุ่ม */
+  height: 100%; /* ให้ปุ่มมีความสูงเต็มฟิลด์ */
+}
+.password-requirements {
+  margin-top: 10px;
+  font-size: 14px;
+  color: red; /* สีเริ่มต้น */
+}
+
+.password-requirements ul {
+  list-style-type: disc; /* สไตล์รายการ */
+  padding-left: 20px; /* ระยะห่างด้านซ้าย */
+}
+
+.password-requirements p {
+  margin-bottom: 5px; /* ระยะห่างระหว่างรายการ */
+}
+
 </style>
