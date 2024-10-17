@@ -130,7 +130,18 @@ const searchTerm = ref('');
 const editIndex = ref<number | null>(null);
 
 // ข้อมูลตัวอย่างเริ่มต้น
-const messages = ref([{ correct: '', incorrect:'' }]);
+const messages = ref([
+  { correct: 'รับประทาน', incorrect: 'รับประทาน' },
+  { correct: 'โทรศัพท์', incorrect: 'โทรศัพย์' },
+  { correct: 'มหาวิทยาลัย', incorrect: 'มหาวิทยาลัย' },
+  { correct: 'ขอโทษ', incorrect: 'ขอโทษ' },
+  { correct: 'บริการ', incorrect: 'บริการ' },
+  { correct: 'ประเทศ', incorrect: 'ประเทษ' },
+  { correct: 'สวัสดี', incorrect: 'สวัสดี' },
+  { correct: 'เพื่อน', incorrect: 'เพื่อน' },
+  { correct: 'วิศวกรรม', incorrect: 'วิศวกรรม' },
+  { correct: 'วรรณกรรม', incorrect: 'วรรณกรรมน' },
+]);
 
 const filteredMessages = messages.value.length > 0 ? computed(() =>
   messages.value.filter((msg) =>
@@ -149,86 +160,86 @@ watch(inputText2, () => {
 
 const submitText = async () => {
   if (inputText1.value && inputText2.value) {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post('http://localhost:3000/word/create', {
-      token: token,
-      correctWord: inputText1.value,
-      incorrectWord: inputText2.value
-    })
-    if(res.data.status){
-      messages.value = res.data.messages
-    }
-    Swal.fire({
-          title: 'สำเร็จ!',
-          text: 'บันทึกคำใหม่แล้ว!',
-          icon: 'success',
-          confirmButtonText: 'ตกลง'
-    });
-    } catch (error) {
-      Swal.fire({
-          title: 'ไม่สำเร็จ!',
-          text: 'บันทึกคำใหม่ล้มเหลว',
-          icon: 'error',
-          confirmButtonText: 'ตกลง'
-    });
-    }
-
-    // if (editIndex.value !== null) {
-    //   const message = messages.value[editIndex.value];
-    //   if (message.correct !== inputText1.value) {
-    //     message.correct = inputText1.value;
-    //   }
-    //   if (message.incorrect !== inputText2.value) {
-    //     message.incorrect = inputText2.value;
-    //   }
-    //   messages.value[editIndex.value] = { ...message };
-    //   editIndex.value = null; // รีเซ็ตตัวแปร index หลังแก้ไข
-
-    //   // ใช้ SweetAlert2 เพื่อแจ้งเตือนว่า "บันทึกการแก้ไขแล้ว"
-    //   Swal.fire({
-    //     title: 'สำเร็จ!',
-    //     text: 'บันทึกการแก้ไขแล้ว!',
-    //     icon: 'success',
-    //     confirmButtonText: 'ตกลง'
-    //   });
-    // } else {
-    //   const existingIndex = messages.value.findIndex(msg =>
-    //     msg.correct === inputText1.value || msg.incorrect === inputText2.value
-    //   );
-
-    //   if (existingIndex !== -1) {
-    //     const message = messages.value[existingIndex];
-    //     if (message.correct !== inputText1.value) {
-    //       message.correct = inputText1.value;
-    //     }
-    //     if (message.incorrect !== inputText2.value) {
-    //       message.incorrect = inputText2.value;
-    //     }
-    //     messages.value[existingIndex] = { ...message };
-
-    //     // SweetAlert2 แจ้งเตือนว่า "บันทึกการแก้ไขแล้ว"
-    //     Swal.fire({
-    //       title: 'สำเร็จ!',
-    //       text: 'บันทึกการแก้ไขแล้ว!',
-    //       icon: 'success',
-    //       confirmButtonText: 'ตกลง'
-    //     });
-    //   } else {
-    //     messages.value.push({
-    //       correct: inputText1.value,
-    //       incorrect: inputText2.value
-    //     });
-
-    //     // SweetAlert2 แจ้งเตือนว่า "บันทึกคำใหม่แล้ว!"
-    //     Swal.fire({
+    // try {
+    //   const token = localStorage.getItem("token");
+    //   const res = await axios.post('http://localhost:3000/word/create', {
+    //   token: token,
+    //   correctWord: inputText1.value,
+    //   incorrectWord: inputText2.value
+    // })
+    // if(res.data.status){
+    //   messages.value = res.data.messages
+    // }
+    // Swal.fire({
     //       title: 'สำเร็จ!',
     //       text: 'บันทึกคำใหม่แล้ว!',
     //       icon: 'success',
     //       confirmButtonText: 'ตกลง'
-    //     });
-    //   }
+    // });
+    // } catch (error) {
+    //   Swal.fire({
+    //       title: 'ไม่สำเร็จ!',
+    //       text: 'บันทึกคำใหม่ล้มเหลว',
+    //       icon: 'error',
+    //       confirmButtonText: 'ตกลง'
+    // });
     // }
+
+    if (editIndex.value !== null) {
+      const message = messages.value[editIndex.value];
+      if (message.correct !== inputText1.value) {
+        message.correct = inputText1.value;
+      }
+      if (message.incorrect !== inputText2.value) {
+        message.incorrect = inputText2.value;
+      }
+      messages.value[editIndex.value] = { ...message };
+      editIndex.value = null; // รีเซ็ตตัวแปร index หลังแก้ไข
+
+      // ใช้ SweetAlert2 เพื่อแจ้งเตือนว่า "บันทึกการแก้ไขแล้ว"
+      Swal.fire({
+        title: 'สำเร็จ!',
+        text: 'บันทึกการแก้ไขแล้ว!',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
+    } else {
+      const existingIndex = messages.value.findIndex(msg =>
+        msg.correct === inputText1.value || msg.incorrect === inputText2.value
+      );
+
+      if (existingIndex !== -1) {
+        const message = messages.value[existingIndex];
+        if (message.correct !== inputText1.value) {
+          message.correct = inputText1.value;
+        }
+        if (message.incorrect !== inputText2.value) {
+          message.incorrect = inputText2.value;
+        }
+        messages.value[existingIndex] = { ...message };
+
+        // SweetAlert2 แจ้งเตือนว่า "บันทึกการแก้ไขแล้ว"
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: 'บันทึกการแก้ไขแล้ว!',
+          icon: 'success',
+          confirmButtonText: 'ตกลง'
+        });
+      } else {
+        messages.value.push({
+          correct: inputText1.value,
+          incorrect: inputText2.value
+        });
+
+        // SweetAlert2 แจ้งเตือนว่า "บันทึกคำใหม่แล้ว!"
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: 'บันทึกคำใหม่แล้ว!',
+          icon: 'success',
+          confirmButtonText: 'ตกลง'
+        });
+      }
+    }
     inputText1.value = '';
     inputText2.value = '';
   } else {

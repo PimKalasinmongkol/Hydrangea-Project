@@ -38,7 +38,7 @@
               <tr>
                 <th class="correct">คำถูก</th>
                 <th class="incorrect">คำผิด</th>
-                <th class="correct">ผู้เผยแพร่</th>
+                <th class="public_user">ผู้เผยแพร่</th>
               </tr>
             </thead>
             <tbody>
@@ -96,14 +96,14 @@ const searchQuery = ref('');
 const vocabularyEntries = ref([
   { correctWord: 'สวัสดี', wrongWords: ['สวัดดี', 'สวัสดี๊'], publisher: 'ผู้ใช้ A' },
   { correctWord: 'ขอบคุณ', wrongWords: ['ขอบคุน', 'ขอบคุณมาก'], publisher: 'ผู้ใช้ B' },
-  { correctWord: 'เรียน', wrongWords: ['รียน', 'เรียนรู้'], publisher: 'ผู้ใช้ C' },
+  { correctWord: 'เรียน', wrongWords: ['เรียน', 'เรียนรู้'], publisher: 'ผู้ใช้ C' },
   { correctWord: 'สวัสดี', wrongWords: ['สวัดดี', 'สวัสดี๊'], publisher: 'ผู้ใช้ D' },
-  { correctWord: 'เรียน', wrongWords: ['รียน', 'เรียนรู้'], publisher: 'ผู้ใช้ C' },
-  { correctWord: 'สวัสดี', wrongWords: ['สวัดดี', 'สวัสดี๊'], publisher: 'ผู้ใช้ D' },
-  { correctWord: 'เรียน', wrongWords: ['รียน', 'เรียนรู้'], publisher: 'ผู้ใช้ C' },
-  { correctWord: 'สวัสดี', wrongWords: ['สวัดดี', 'สวัสดี๊'], publisher: 'ผู้ใช้ D' },
-  { correctWord: 'เรียน', wrongWords: ['รียน', 'เรียนรู้'], publisher: 'ผู้ใช้ C' },
-  { correctWord: 'สวัสดี', wrongWords: ['สวัดดี', 'สวัสดี๊'], publisher: 'ผู้ใช้ D' },
+  { correctWord: 'เรียน', wrongWords: ['เรียน', 'เรียนรู้'], publisher: 'ผู้ใช้ C' },
+  { correctWord: 'สวัสดี', wrongWords: ['สวัดดี', 'สวัสดี๊'], publisher: 'ผู้ใช้ E' },
+  { correctWord: 'เรียน', wrongWords: ['เรียน', 'เรียนรู้'], publisher: 'ผู้ใช้ F' },
+  { correctWord: 'สวัสดี', wrongWords: ['สวัดดี', 'สวัสดี๊'], publisher: 'ผู้ใช้ G' },
+  { correctWord: 'เรียน', wrongWords: ['เรียน', 'เรียนรู้'], publisher: 'ผู้ใช้ H' },
+  { correctWord: 'สวัสดี', wrongWords: ['สวัดดี', 'สวัสดี๊'], publisher: 'ผู้ใช้ I' },
 ]);
 
 const filteredEntries = ref([...vocabularyEntries.value]); // เริ่มต้นด้วยข้อมูลทั้งหมด
@@ -200,6 +200,10 @@ const searchVocabulary = () => {
 
 .correct {
   background-color: #487251;
+}
+
+.public_user{
+  background-color: #ffaa00;
 }
 
 .incorrect {
