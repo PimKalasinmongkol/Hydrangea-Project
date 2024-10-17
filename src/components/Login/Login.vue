@@ -2,7 +2,7 @@
   <div class="container-login">
     <div class="wrapper">
       <div class="title-text">
-        <div v-if="isLogin" class="title login">Login Form</div>
+        <div v-if="isLogin" class="title login">SignIn Form</div>
         <div v-else class="title signup">Signup Form</div>
       </div>
       <div class="form-container">
