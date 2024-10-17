@@ -2,7 +2,7 @@
   <div class="container-login">
     <div class="wrapper">
       <div class="title-text">
-        <div v-if="isLogin" class="title login">SignIn Form</div>
+        <div v-if="isLogin" class="title login">Login Form</div>
         <div v-else class="title signup">Signup Form</div>
       </div>
       <div class="form-container">
@@ -11,13 +11,13 @@
           <!-- Login Form -->
           <form v-if="isLogin" @submit.prevent="handleLogin">
             <div class="field">
-              <input type="text" v-model="loginForm.email" placeholder="Email Address" required />
+              <input type="email" v-model="loginForm.email" placeholder="Email Address" required />
             </div>
             <div class="field">
               <input type="password" v-model="loginForm.password" placeholder="Password" required />
             </div>
             <div class="pass-link">
-              <a href="#" @click.prevent="handleForgotPassword">Forgot Password?</a> <!-- เรียกใช้ฟังก์ชันนี้ -->
+              <a href="#" @click.prevent="handleForgotPassword">Forgot Password?</a>
             </div>
             <div class="field">
               <input type="submit" value="Login" />
@@ -30,10 +30,10 @@
           <!-- Signup Form -->
           <form v-else @submit.prevent="handleSignup">
             <div class="field">
-              <input type="text" v-model="signupForm.email" placeholder="Username" required />
+              <input type="text" v-model="signupForm.username" placeholder="Username" required />
             </div>
             <div class="field">
-              <input type="text" v-model="signupForm.email" placeholder="Email Address" required />
+              <input type="email" v-model="signupForm.email" placeholder="Email Address" required />
             </div>
             <div class="field">
               <input type="text" v-model="signupForm.otp" placeholder="Enter OTP" required />
@@ -45,7 +45,7 @@
               <input type="password" v-model="signupForm.password" placeholder="Password" required />
             </div>
             <div class="field">
-              <input type="password" v-model="signupForm.password" placeholder="Confirm Password" required />
+              <input type="password" v-model="signupForm.confirmPassword" placeholder="Confirm Password" required />
             </div>
             <div class="field">
               <input type="submit" value="Sign Up" />
@@ -55,6 +55,7 @@
             </div>
           </form>
 
+
         </div>
       </div>
     </div>
@@ -63,7 +64,9 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import Swal from 'sweetalert2'; // นำเข้า sweetalert2
 import { useRouter } from 'vue-router';
+
 
 export default defineComponent({
   name: 'LoginSignup',
@@ -84,44 +87,61 @@ export default defineComponent({
       confirmPassword: ''
     });
 
- // สลับระหว่างฟอร์ม Login และ Signup
- const toggleForm = () => {
+    const toggleForm = () => {
       isLogin.value = !isLogin.value;
     };
 
-    // ฟังก์ชัน Login
+
     const handleLogin = () => {
-      // จำลองการเข้าสู่ระบบ
+
       console.log('Logging in with:', loginForm.value);
       router.push({ name: 'MyVocab' });
     };
 
-    // ฟังก์ชัน Signup
+
+    // ตรวจสอบรูปแบบ (Pattern) ของ Email
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // ตรวจสอบรูปแบบ OTP (ตัวเลข 6 หลัก)
+    const otpPattern = /^\d{6}$/;
+    // ตรวจสอบรูปแบบของ Password (ระหว่าง 8-20 ตัวอักษร สามารถมีทั้งตัวเลข ตัวอักษร และอักขระพิเศษ)
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+=-]{8,20}$/;
+
+
+
     const handleSignup = () => {
-      console.log('Signing up with:', signupForm.value);
-      if (signupForm.value.password !== signupForm.value.confirmPassword) {
-        alert('Passwords do not match!');
+      const { email, otp, password, confirmPassword } = signupForm.value;
+
+      // ตรวจสอบ email
+      if (!emailPattern.test(email)) {
+        Swal.fire('Error', 'Invalid email format!', 'error');
         return;
       }
-      // เมื่อ Sign Up สำเร็จ ให้ไปยังหน้า Login
+
+      // ตรวจสอบ OTP
+      if (!otpPattern.test(otp)) {
+        Swal.fire('Error', 'OTP must be 6 digits!', 'error');
+        return;
+      }
+
+      // ตรวจสอบ Password
+      if (!passwordPattern.test(password)) {
+        Swal.fire('Error', 'Password must be between 8 to 20 characters and include letters, numbers, and special characters!', 'error');
+        return;
+      }
+
+      // ตรวจสอบ Password กับ Confirm Password
+      if (password !== confirmPassword) {
+        Swal.fire('Error', 'Passwords do not match!', 'error');
+        return;
+      }
+
+      Swal.fire('Success', 'Signup completed successfully!', 'success');
       router.push({ name: 'Login' });
     };
 
-    // ส่ง OTP ไปยังผู้ใช้
-    const sendOtp = () => {
-      console.log('Sending OTP to:', signupForm.value.email);
-      // เพิ่มฟังก์ชันสำหรับส่ง OTP ที่นี่
-    };
 
-    // ฟังก์ชัน Forgot Password
     const handleForgotPassword = () => {
       router.push({ name: 'sentOTP' });
-    };
-
-    // นำทางไปยังหน้า Login หลังจาก Sign Up สำเร็จ
-    const navigateToLogin = () => {
-      isLogin.value = true;  // เปลี่ยนสถานะเป็น Login
-      router.push({ name: 'Login' });  // ไปยังหน้า Login
     };
 
     return {
@@ -202,7 +222,6 @@ export default defineComponent({
   margin-left: 2px;
   text-align: left;
 }
-
 
 .form-inner form .pass-link a,
 .form-inner form .signup-link a {
