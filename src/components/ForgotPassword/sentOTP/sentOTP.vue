@@ -16,11 +16,20 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 
 const goToConfirmOTPPage = () => {
-  router.push({ name: 'ConfirmOTP' });
+  Swal.fire({
+        title: 'OTP ส่งสำเร็จ!',
+        text: 'โปรดเช็คอีเมลของคุณ',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      }).then(() => {
+        // หลังจากกด "ตกลง" จะเปลี่ยนไปยังหน้า ConfirmOTP
+        router.push({ name: 'ConfirmOTP' });
+      });
 };
 
 const goToLoginPage = () => {

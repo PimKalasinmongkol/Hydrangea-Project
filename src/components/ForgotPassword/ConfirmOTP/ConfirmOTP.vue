@@ -16,11 +16,19 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 
 const goToChangePasswordPage = () => {
-  router.push({ name: 'ChangeNewPassword' });
+  Swal.fire({
+        title: 'ยืนยันสำเร็จ!',
+        text: 'คุณสามารถเปลี่ยนรหัสผ่านใหม่ได้แล้ว',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      }).then(() => {
+        router.push({ name: 'ChangeNewPassword' });
+      });
 };
 
 const goToLoginPage = () => {

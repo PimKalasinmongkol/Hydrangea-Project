@@ -31,7 +31,7 @@
             </div>
           </div>
         </div>
-        <button class="btn-password font-thai" @click="goToMyVocabPage">เปลี่ยนรหัสผ่าน</button>
+        <button class="btn-password font-thai" @click="goToLoginPage">เปลี่ยนรหัสผ่าน</button>
       </div>
     </div>
   </div>
@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 const showPassword = ref(false);
@@ -58,8 +59,15 @@ const goToMyVocabPage = () => {
 };
 
 const goToLoginPage = () => {
-  router.push({ name: 'Login' });
-};
+  Swal.fire({
+        title: 'เปลี่ยนรหัสผ่านสำเร็จ',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      }).then(() => {
+        // หลังจากผู้ใช้กดปุ่ม OK จะเปลี่ยนไปหน้า login
+        router.push({ name: 'Login' });
+      });
+    };
 
 
 </script>
