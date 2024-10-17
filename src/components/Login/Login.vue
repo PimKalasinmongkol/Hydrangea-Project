@@ -48,8 +48,7 @@
               <input type="text" v-model="signupForm.otp" placeholder="กรอก OTP 6 หลัก" required />
             </div>
             <div class="field">
-              <input type="submit" :value="isOtpSent ? 'ส่ง OTP อีกครั้ง' : 'ส่ง OTP '" :disabled="isOtpSent"
-                @click.prevent="sendOtp" />
+              <input type="submit" :value="isOtpSent ? 'ส่ง OTP อีกครั้ง (' + countdown + ')': 'ส่ง OTP'" :disabled="isOtpSent" @click.prevent="sendOtp">
             </div>
             <div class="field">
               <input type="password" v-model="signupForm.password" @input="checkPassword" placeholder="กรอกรหัสผ่าน"
@@ -87,8 +86,8 @@ export default defineComponent({
   name: 'LoginSignup',
   setup() {
     const router = useRouter(); // ใช้ router
-    const isLogin = ref(true);
-
+    const isLogin = ref<boolean>(true);
+    const countdown = ref<number>(30);
     const loginForm = ref({
       email: '',
       password: ''
@@ -168,7 +167,7 @@ export default defineComponent({
       }
     };
 
-    const sendOtp = () => {
+    const sendOtp = async () => {
       // Check if the email is provided
       if (!signupForm.value.email) {
         Swal.fire('Error', 'Please enter your email address!', 'error');
@@ -186,12 +185,16 @@ export default defineComponent({
 
       // Simulate sending the OTP (replace with your actual OTP sending logic)
       console.log('Sending OTP to:', signupForm.value.email);
-      Swal.fire('Success', 'OTP sent to your email!', 'success');
-
-      // Start the 30-second timer
-      setTimeout(() => {
-        isOtpSent.value = false; // Re-enable the button after 30 seconds
-      }, 30000);
+      for (let i = 30; i > 0; i--) {
+        setTimeout(() => {
+          --countdown.value;
+          if (countdown.value == 0) {
+            isOtpSent.value = false;
+            countdown.value = 30;
+          }
+        }, 1000 * (31 - i)); // Multiplies the delay based on the loop index
+    }
+    Swal.fire('Success', 'OTP sent to your email!', 'success');
     };
 
     const handleSignup = () => {
@@ -257,6 +260,7 @@ export default defineComponent({
       handleLogin,
       showPassword,
       togglePasswordVisibility,
+      countdown
     };
   }
 });
