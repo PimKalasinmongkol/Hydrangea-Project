@@ -105,6 +105,9 @@ const specialCharValid = ref(false);
 const checkToken = async () => {
   const otp = localStorage.getItem("otp");
   try {
+    if(!otp){
+      router.push({ name: "sentOTP" });
+    }
     const res = await axios.post(
       "http://localhost:3000/auth/resetpassword-otp-check",
       {
